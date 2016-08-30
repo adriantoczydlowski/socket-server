@@ -1,0 +1,4 @@
+{
+  "extends": "tslint:latest",
+  "no-console": ["error", { "allow": ["warn", "error"] }]
+}

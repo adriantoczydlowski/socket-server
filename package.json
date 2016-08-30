@@ -1,0 +1,49 @@
+{
+  "name": "socket-server",
+  "version": "0.0.0",
+  "description": "socket-server",
+  "license": "MIT",
+  "repository": "",
+  "author": "",
+  "keywords": [
+    ""
+  ],
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "clean": "rimraf lib",
+    "lint": "tslint --format verbose 'src/**/*.ts'",
+    "build": "npm run clean && echo Using TypeScript && tsc --version && tsc --pretty",
+    "test": "npm run build && mocha --compilers ts:ts-node/register --recursive test/**/*-spec.ts",
+    "watch": "npm run build -- --watch",
+    "watch:test": "npm run test -- --watch"
+  },
+  "dependencies": {
+    "@types/cors": "0.0.32",
+    "@types/express": "^4.0.32",
+    "cors": "^2.8.0",
+    "es6-shim": "^0.35.1",
+    "express": "^4.14.0",
+    "rxjs": "^5.0.0-beta.1",
+    "ws": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/chai": "3.4.30",
+    "@types/es6-shim": "0.0.31",
+    "@types/mocha": "2.2.29",
+    "@types/node": "6.0.31",
+    "@types/ws": "0.0.30",
+    "chai": "^3.5.0",
+    "mocha": "^3.0.1",
+    "rimraf": "^2.5.4",
+    "ts-node": "^1.2.2",
+    "tslint": "3.14.0-dev.1",
+    "typescript": "2.0.0"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}
