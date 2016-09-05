@@ -1,9 +1,12 @@
 
 // import { createServer } from "http";
 import { drgs } from "../data/drg.json";
+import * as redis from '../redis/index';
 import * as cors from "cors";
 import "es6-shim";
 import * as express from "express";
+import * as expressSession from "express-session";
+import * as socketSession from "express-socket.io-session";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/map";
@@ -13,8 +16,14 @@ import "rxjs/add/operator/share";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { Server } from "ws";
+let session = expressSession({
+  secret: "my-secret",
+  resave: true,
+  saveUninitialized: true
+});
 let app = express();
 app.use(cors());
+app.use(session);
 
 const searchDrgs = (query: any) => {
   query.ms_drg = query.ms_drg ? parseInt(query.ms_drg, 10) : undefined;
@@ -66,6 +75,7 @@ const createRxServer = (options: any) => {
   return new Observable((serverObserver: any) => {
     console.warn("started server...", options);
     let wss = new Server(options);
+    wss.use(socketSession);
     wss.on("connection", (connection: any) => {
       // console.warn("connection", connection);
       return serverObserver.next(connection);

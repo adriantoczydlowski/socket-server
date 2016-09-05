@@ -9,7 +9,8 @@
     "removeComments": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "redis/**/*"
   ],
   "exclude": [
     "node_modules",
