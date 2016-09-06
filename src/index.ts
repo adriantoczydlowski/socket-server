@@ -1,12 +1,13 @@
 
 // import { createServer } from "http";
 import { drgs } from "../data/drg.json";
-import * as redis from '../redis/index';
+import { config } from "../config";
+import { client, redisStore } from '../redis/index';
 import * as cors from "cors";
 import "es6-shim";
 import * as express from "express";
 import * as expressSession from "express-session";
-import * as socketSession from "express-socket.io-session";
+import * as cookieParser from "cookie-parser";
 import "rxjs/add/observable/fromEvent";
 import "rxjs/add/observable/interval";
 import "rxjs/add/operator/map";
@@ -16,13 +17,24 @@ import "rxjs/add/operator/share";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { Server } from "ws";
+let e = require('express');
+var cookie = require('cookie');
+var test = require('cookie-parser');
+let c = cookieParser();
+let RedisStore = require("connect-redis")(expressSession);
+let sessionStore = new RedisStore({
+  host: config.REDISURL
+  
+});
 let session = expressSession({
-  secret: "my-secret",
+  store: sessionStore,
+  secret: "some secret",
   resave: true,
   saveUninitialized: true
 });
 let app = express();
 app.use(cors());
+app.use(c);
 app.use(session);
 
 const searchDrgs = (query: any) => {
@@ -75,9 +87,25 @@ const createRxServer = (options: any) => {
   return new Observable((serverObserver: any) => {
     console.warn("started server...", options);
     let wss = new Server(options);
-    wss.use(socketSession);
     wss.on("connection", (connection: any) => {
-      // console.warn("connection", connection);
+       var cookies = cookie.parse(connection.upgradeReq.headers.cookie);
+       console.log('ccokiie', cookies["connect.sid"]);
+       var sid = test.signedCookie(cookies["connect.sid"], "some secret");
+       console.log('sid', sid);
+       client.get(cookies["connect.sid"], function(err: any, sess: any) {
+          console.log('err', err);
+          console.log('session', sess);
+      });
+      client.on("subscribe", function(channel: any, count: any) {
+          console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
+      });
+
+      client.on("message", function(channel: any, message: any) {
+          console.log("Message from channel " + channel + ": " + message);
+      });
+
+      client.subscribe("analytics");
+
       return serverObserver.next(connection);
     });
     return () => {

@@ -46,7 +46,7 @@ export var addUserToRoom = (user: string, room: string) => {
 };
 
 export var removeUserFromRoom = (user: string, room: string) => {
-  client.mutli()
+  client.multi()
     .zrem('rooms:' + room, user)
     .del('user:' + user + ':room')
     .exec();
